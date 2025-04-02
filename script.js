@@ -6,13 +6,11 @@ const questions = [
   { question: "What is the capital of Canada?", choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"], answer: "Ottawa" }
 ];
 
-// Retrieve saved answers from sessionStorage
 let userAnswers = JSON.parse(sessionStorage.getItem("progress")) || {};
 
-// Render questions
 function renderQuestions() {
   const questionsElement = document.getElementById("questions");
-  questionsElement.innerHTML = ""; // Clear previous content
+  questionsElement.innerHTML = "";
 
   questions.forEach((q, index) => {
     const questionDiv = document.createElement("div");
@@ -28,7 +26,10 @@ function renderQuestions() {
       radio.type = "radio";
       radio.name = `question-${index}`;
       radio.value = choice;
-      radio.checked = userAnswers[index] === choice;
+
+      if (userAnswers[index] && userAnswers[index] === choice) {
+        radio.setAttribute("checked", true);
+      }
 
       radio.addEventListener("change", () => {
         userAnswers[index] = choice;
@@ -45,25 +46,15 @@ function renderQuestions() {
   });
 }
 
-renderQuestions();
+window.onload = () => {
+  renderQuestions();
+};
 
-// Handle submission
 document.getElementById("submit").addEventListener("click", () => {
   let score = 0;
   questions.forEach((q, index) => {
-    if (userAnswers[index] === q.answer) {
-      score++;
-    }
+    if (userAnswers[index] === q.answer) score++;
   });
-
   document.getElementById("score").textContent = `Your score is ${score} out of ${questions.length}.`;
   localStorage.setItem("score", score);
 });
-
-// Display score from localStorage on page load
-window.onload = () => {
-  const storedScore = localStorage.getItem("score");
-  if (storedScore) {
-    document.getElementById("score").textContent = `Your score is ${storedScore} out of ${questions.length}.`;
-  }
-};
